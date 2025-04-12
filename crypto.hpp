@@ -12,6 +12,7 @@
 // TODO вывод на экран :( (хранить в файле и тип данных ?)
 // TODO сравнение объектов
 // TODO шифрование данных длинее 256 байт
+// TODO разобраться с move конструкторами и операторами
 
 class FileException : public std::exception {
 private:
@@ -123,7 +124,6 @@ public:
 		//if (!check_file(fin)) throw std::exception("file error");
 		check_file(fin);
 		unsigned char tmp[sizeof(out)];
-		// ?
 		fin.read((char*)tmp, sizeof(out));
 		unsigned char* p = reinterpret_cast<unsigned char*>(&out);
 		for (int i = 0; i < sizeof(out); i++)
@@ -235,7 +235,7 @@ public:
 		return *this;
 	}
 
-	//template<> Не работает как специализация шаблона
+	//template<>// Не работает как специализация шаблона
 	Encryptor& operator<<(const std::string& data) {
 		std::ofstream fout(filename, std::ios::out | std::ios::app | std::ios::binary);
 		//if (!check_file(fout)) throw std::exception("file error");
