@@ -1,4 +1,4 @@
-#include "crypto.hpp"
+﻿#include "crypto.hpp"
 
 int main() {
 	Encryptor enc("test.enc");

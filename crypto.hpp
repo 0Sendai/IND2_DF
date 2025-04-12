@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -7,11 +7,11 @@
 #include <exception>
 #include <cstring>
 
-// TODO документирующие комментарии
-// TODO перегрузка операций присваивания
-// TODO вывод на экран :( (хранить в файле и тип данных ?)
-// TODO сравнение объектов
-// TODO шифрование данных длинее 256 байт
+// TODO РґРѕРєСѓРјРµРЅС‚РёСЂСѓСЋС‰РёРµ РєРѕРјРјРµРЅС‚Р°СЂРёРё
+// TODO РїРµСЂРµРіСЂСѓР·РєР° РѕРїРµСЂР°С†РёР№ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ
+// TODO РІС‹РІРѕРґ РЅР° СЌРєСЂР°РЅ :( (С…СЂР°РЅРёС‚СЊ РІ С„Р°Р№Р»Рµ Рё С‚РёРї РґР°РЅРЅС‹С… ?)
+// TODO СЃСЂР°РІРЅРµРЅРёРµ РѕР±СЉРµРєС‚РѕРІ
+// TODO С€РёС„СЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С… РґР»РёРЅРµРµ 256 Р±Р°Р№С‚
 
 class FileException : public std::exception {
 private:
@@ -79,7 +79,7 @@ public:
 
 	Decryptor(const char* encrypted_file, const char* key_filename) : filename(encrypted_file) {
 		std::ifstream keyfile(key_filename, std::ios::in | std::ios::binary);
-		// TODO проверка нужна
+		// TODO РїСЂРѕРІРµСЂРєР° РЅСѓР¶РЅР°
 		unsigned char inv_key[256];
 		keyfile.read((char*)inv_key, sizeof(inv_key));
 		keyfile.close();
@@ -87,7 +87,7 @@ public:
 			key[inv_key[i]] = i;
 	}
 
-	// TODO Будет ли мешать не в vs 22 ?
+	// TODO Р‘СѓРґРµС‚ Р»Рё РјРµС€Р°С‚СЊ РЅРµ РІ vs 22 ?
 	Decryptor(const Decryptor& other) {
 		memcpy_s(key, sizeof(key), other.key, sizeof(key));
 		filename = other.filename;
@@ -97,7 +97,7 @@ public:
 	//Decryptor& operator=(const Decryptor&) = delete;
 
 
-	// TODO нужно ли все это ?
+	// TODO РЅСѓР¶РЅРѕ Р»Рё РІСЃРµ СЌС‚Рѕ ?
 	Decryptor(Decryptor&& other) noexcept {
 		//enc_file = std::move(other.enc_file);
 		filename = std::move(other.filename);
@@ -134,7 +134,7 @@ public:
 		return *this;
 	}
 
-	// out обязательно nullptr
+	// out РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ nullptr
 	template<>
 	Decryptor& operator>>(char*& out) {
 		//std::ifstream fin(filename, std::ios::in | std::ios::binary);
@@ -226,7 +226,7 @@ public:
 		//if (!check_file(fout)) throw std::exception("file error");
 		check_file(fout);
 		uint8_t len = (uint8_t)strlen(data);
-		// TODO строки больше ключа ?
+		// TODO СЃС‚СЂРѕРєРё Р±РѕР»СЊС€Рµ РєР»СЋС‡Р° ?
 		if (len > 256) throw std::exception("long string");
 		fout.write((char*)&len, sizeof(len));
 		for (uint8_t i = 0; i < len; i++)
@@ -235,7 +235,7 @@ public:
 		return *this;
 	}
 
-	//template<> Не работает как специализация шаблона
+	//template<> РќРµ СЂР°Р±РѕС‚Р°РµС‚ РєР°Рє СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ С€Р°Р±Р»РѕРЅР°
 	Encryptor& operator<<(const std::string& data) {
 		std::ofstream fout(filename, std::ios::out | std::ios::app | std::ios::binary);
 		//if (!check_file(fout)) throw std::exception("file error");
