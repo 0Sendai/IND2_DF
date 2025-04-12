@@ -1,2 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ClassDiagram /> 
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CryptoKey">
+    <Position X="6.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAQAABAAAAAAAEAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>crypto.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Decryptor">
+    <Position X="8.5" Y="6.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAoAAAAAAAAAAAgAIAAAAAAAACAAgAAAAAAA=</HashCode>
+      <FileName>crypto.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Encryptor">
+    <Position X="3.75" Y="6.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAgAAAAAAAACAAAACAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>crypto.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FileException">
+    <Position X="10" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>crypto.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
