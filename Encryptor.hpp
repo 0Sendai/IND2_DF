@@ -30,8 +30,7 @@ public:
 	}
 
 	Encryptor(const char* encrypted_file, const unsigned char* key) : filename(encrypted_file) {
-		//std::ofstream file(filename);
-		//if (file.is_open()) file.close();
+		// append to encrypted_file
 		for (int i = 0; i < 256; i++)
 			this->key[key[i]] = i;
 	}
@@ -39,6 +38,35 @@ public:
 	Encryptor(const Encryptor& other) {
 		filename = other.filename;
 		memcpy_s(key, sizeof(key), other.key, sizeof(key));
+	}
+
+	Encryptor(Encryptor&& other) noexcept {
+		filename = std::move(other.filename);
+		memcpy_s(key, sizeof(key), other.key, sizeof(key));
+	}
+
+	Encryptor& operator=(const Encryptor& other) {
+		if (this != &other) {
+			filename = other.filename;
+			memcpy_s(key, sizeof(key), other.key, sizeof(key));
+		}
+		return *this;
+	}
+
+	Encryptor& operator=(Encryptor&& other) {
+		if (this != &other) {
+			filename = std::move(other.filename);
+			memcpy_s(key, sizeof(key), other.key, sizeof(key));
+		}
+		return *this;
+	}
+
+	bool operator==(const Encryptor& other) const {
+		return !(memcmp(key, other.key, sizeof(key))) && filename == other.filename;
+	}
+
+	bool operator!=(const Encryptor& other) const {
+		return !(*this == other);
 	}
 
 	template <typename T>
@@ -57,7 +85,6 @@ public:
 		std::ofstream fout(filename, std::ios::out | std::ios::app | std::ios::binary);
 		check_file(fout);
 		uint16_t len = (uint16_t)strlen(data);
-		//if (len > 256) throw std::exception("long string");
 		fout.write((char*)&len, sizeof(len));
 		for (uint16_t i = 0; i < len; i++)
 			fout.write((char*)&key[(unsigned char)data[i]], sizeof(char));
@@ -68,7 +95,6 @@ public:
 	//template<>// Ќе работает как специализаци€ шаблона
 	Encryptor& operator<<(const std::string& data) {
 		std::ofstream fout(filename, std::ios::out | std::ios::app | std::ios::binary);
-		//if (!check_file(fout)) throw std::exception("file error");
 		check_file(fout);
 		uint16_t len = (uint16_t)data.length();
 		fout.write((char*)&len, sizeof(len));

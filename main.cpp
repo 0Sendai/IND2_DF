@@ -16,12 +16,12 @@ int main() {
 	Decryptor dec("test.enc", "key.enc");
 	string s;
 	dec >> s;
-	cout << s << endl;
+	/*cout << s << endl;
 	Encryptor enc = dec.make_encryptor();
 	enc << 105;
 	int x;
 	dec >> x;
-	cout << x << endl;
+	cout << x << endl;*/
 
 	//char b[] = "test";
 	//std::string c("hey");
