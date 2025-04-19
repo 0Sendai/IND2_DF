@@ -53,7 +53,7 @@ public:
 		return *this;
 	}
 
-	Encryptor& operator=(Encryptor&& other) {
+	Encryptor& operator=(Encryptor&& other) noexcept{
 		if (this != &other) {
 			filename = std::move(other.filename);
 			memcpy_s(key, sizeof(key), other.key, sizeof(key));

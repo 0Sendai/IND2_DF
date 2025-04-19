@@ -52,7 +52,7 @@ public:
 
 	~Decryptor() { if (fin.is_open()) fin.close(); }
 
-	Decryptor& operator=(Decryptor&& other){
+	Decryptor& operator=(Decryptor&& other) noexcept{
 		if (this != &other) {
 			filename = std::move(other.filename);
 			memcpy_s(key, sizeof(key), other.key, sizeof(key));
