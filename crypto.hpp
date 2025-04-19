@@ -11,7 +11,6 @@
 // TODO перегрузка операций присваивания
 // TODO вывод на экран :( (хранить в файле и тип данных ?)
 // TODO сравнение объектов
-// TODO шифрование данных длинее 256 байт
 
 class FileException : public std::exception {
 private:
@@ -22,7 +21,7 @@ public:
 
 class CryptoKey {
 protected:
-	unsigned char key[256];
+	unsigned char key[256]{};
 	FileException fexception;
 public:
 	void make_key() {
@@ -37,7 +36,6 @@ public:
 	}
 	void write_key(const char* filename) const {
 		std::ofstream fout(filename, std::ios::out | std::ios::binary);
-		//if (!fout.is_open()) throw std::exception("Couldn't open the file");
 		if (!fout.is_open()) throw fexception;
 		fout.write((char*)key, sizeof(key));
 		fout.close();
@@ -45,7 +43,6 @@ public:
 
 	void read_key(const char* filename) {
 		std::ifstream fin(filename, std::ios::in | std::ios::binary);
-		//if (!fin.is_open()) throw std::exception("Couldn't open the file");
 		if (!fin.is_open()) throw fexception;
 		fin.read((char*)key, sizeof(key));
 		fin.close();
@@ -56,7 +53,7 @@ public:
 class Decryptor : public CryptoKey {
 protected:
 	std::string filename;
-	
+
 	std::ifstream fin;
 
 	void check_file(std::ifstream& file) {
@@ -65,10 +62,8 @@ protected:
 			// open default file
 			filename = "encrypted.enc";
 			file.open(filename, std::ios::in | std::ios::binary);
-			//if (!file.is_open()) return false;
 			if (!file.is_open()) throw fexception;
 		}
-		//return true;
 	}
 public:
 	Decryptor() {};
@@ -79,7 +74,7 @@ public:
 
 	Decryptor(const char* encrypted_file, const char* key_filename) : filename(encrypted_file) {
 		std::ifstream keyfile(key_filename, std::ios::in | std::ios::binary);
-		// TODO проверка нужна
+		
 		unsigned char inv_key[256];
 		keyfile.read((char*)inv_key, sizeof(inv_key));
 		keyfile.close();
@@ -93,14 +88,12 @@ public:
 		filename = other.filename;
 	}
 
-	//Decryptor(const Decryptor& other) = delete;
-	//Decryptor& operator=(const Decryptor&) = delete;
-
 
 	// TODO нужно ли все это ?
 	Decryptor(Decryptor&& other) noexcept {
 		//enc_file = std::move(other.enc_file);
 		filename = std::move(other.filename);
+		fin = std::move(other.fin);
 		memcpy_s(key, sizeof(key), other.key, sizeof(key));
 	}
 
@@ -142,14 +135,14 @@ public:
 			fin.open(filename, std::ios::in | std::ios::binary);
 		//if (!check_file(fin)) throw std::exception("file error");
 		check_file(fin);
-		uint8_t len;
+		uint16_t len;
 		fin.read((char*)&len, sizeof(len));
 		//std::cout << len << std::endl;
 		unsigned char* tmp = new unsigned char[len];
 		if (!out) delete[] out;
 		out = new char [len + 1];
 		fin.read((char*)tmp, len);
-		for (uint8_t i = 0; i < len; i++)
+		for (uint16_t i = 0; i < len; i++)
 			out[i] = key[tmp[i]];
 
 		delete[] tmp;
@@ -166,12 +159,12 @@ public:
 			fin.open(filename, std::ios::in | std::ios::binary);
 		//if (!check_file(fin)) throw std::exception("file error");
 		check_file(fin);
-		uint8_t len;
+		uint16_t len;
 		fin.read((char*)&len, sizeof(len));
 		out.resize(len);
 		unsigned char* tmp = new unsigned char[len];
 		fin.read((char*)tmp, len);
-		for (uint8_t i = 0; i < len; i++)
+		for (uint16_t i = 0; i < len; i++)
 			out[i] = key[tmp[i]];
 		delete[] tmp;
 		//fin.close();
@@ -190,10 +183,8 @@ protected:
 			// open default file
 			filename = "encrypted.enc";
 			file.open(filename, std::ios::out | std::ios::app | std::ios::binary);
-			//if (!file.is_open()) return false;
 			if (!file.is_open()) throw fexception;
 		}
-		//return true;
 	}
 
 public:
@@ -211,7 +202,6 @@ public:
 	template <typename T>
 	Encryptor& operator<<(T data) {
 		std::ofstream fout(filename, std::ios::out | std::ios::app | std::ios::binary);
-		//if (!check_file(fout)) throw std::exception("file error");
 		check_file(fout);
 		unsigned char* p = reinterpret_cast<unsigned char*>(&data);
 		for (int i = 0; i < sizeof(data); i++)
@@ -223,14 +213,12 @@ public:
 	template<>
 	Encryptor& operator<<(const char* data) {
 		std::ofstream fout(filename, std::ios::out | std::ios::app | std::ios::binary);
-		//if (!check_file(fout)) throw std::exception("file error");
 		check_file(fout);
-		uint8_t len = (uint8_t)strlen(data);
-		// TODO строки больше ключа ?
-		if (len > 256) throw std::exception("long string");
+		uint16_t len = (uint16_t)strlen(data);
+		//if (len > 256) throw std::exception("long string");
 		fout.write((char*)&len, sizeof(len));
-		for (uint8_t i = 0; i < len; i++)
-			fout.write((char*)&key[data[i]], sizeof(char));
+		for (uint16_t i = 0; i < len; i++)
+			fout.write((char*)&key[(unsigned char)data[i]], sizeof(char));
 		fout.close();
 		return *this;
 	}
@@ -240,10 +228,10 @@ public:
 		std::ofstream fout(filename, std::ios::out | std::ios::app | std::ios::binary);
 		//if (!check_file(fout)) throw std::exception("file error");
 		check_file(fout);
-		uint8_t len = (uint8_t)data.length();
+		uint16_t len = (uint16_t)data.length();
 		fout.write((char*)&len, sizeof(len));
-		for (uint8_t i = 0; i < len; i++)
-			fout.write((char*)&key[data[i]], sizeof(char));
+		for (uint16_t i = 0; i < len; i++)
+			fout.write((char*)&key[(unsigned char)data[i]], sizeof(char));
 		fout.close();
 		return *this;
 	}
