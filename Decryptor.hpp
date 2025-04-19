@@ -1,54 +1,14 @@
 ﻿#pragma once
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <cstdlib>
-#include <ctime>
-#include <exception>
 #include <cstring>
+#include "CryptoKey.hpp"
 
 // TODO документирующие комментарии
 // TODO перегрузка операций присваивания
 // TODO вывод на экран :( (хранить в файле и тип данных ?)
 // TODO сравнение объектов
+// TODO разобраться с move конструкторами и операторами
 
-class FileException : public std::exception {
-private:
-	const static constexpr char* message = "File access error";
-public:
-	const char* what() { return message; }
-};
-
-class CryptoKey {
-protected:
-	unsigned char key[256]{};
-	FileException fexception;
-public:
-	void make_key() {
-		std::srand(std::time(0));
-		for (int i = 0; i < 256; i++)
-			key[i] = i;
-		for (int i = 0; i < 5000; i++) {
-			int a = rand() % 256;
-			int b = rand() % 256;
-			std::swap(key[a], key[b]);
-		}
-	}
-	void write_key(const char* filename) const {
-		std::ofstream fout(filename, std::ios::out | std::ios::binary);
-		if (!fout.is_open()) throw fexception;
-		fout.write((char*)key, sizeof(key));
-		fout.close();
-	}
-
-	void read_key(const char* filename) {
-		std::ifstream fin(filename, std::ios::in | std::ios::binary);
-		if (!fin.is_open()) throw fexception;
-		fin.read((char*)key, sizeof(key));
-		fin.close();
-	}
-	
-};
+class Encryptor;
 
 class Decryptor : public CryptoKey {
 protected:
@@ -170,73 +130,7 @@ public:
 		return *this;
 	}
 
+	Encryptor make_encryptor() const;
 };
 
-class Encryptor : public CryptoKey {
-protected:
-	std::string filename;
-
-	void check_file(std::ofstream& file) {
-		if (!file.is_open()) {
-			file.clear();
-			// open default file
-			filename = "encrypted.enc";
-			file.open(filename, std::ios::out | std::ios::app | std::ios::binary);
-			if (!file.is_open()) throw fexception;
-		}
-	}
-
-public:
-	Encryptor(const char* filename): filename(filename) {
-		// truncate if file exist
-		std::ofstream file(filename);
-		if (file.is_open()) file.close();
-		make_key();
-	}
-
-	Encryptor(const char* filename, const char* keyfile): filename(filename) {
-		this->read_key(keyfile);
-	}
-
-	template <typename T>
-	Encryptor& operator<<(T data) {
-		std::ofstream fout(filename, std::ios::out | std::ios::app | std::ios::binary);
-		check_file(fout);
-		unsigned char* p = reinterpret_cast<unsigned char*>(&data);
-		for (int i = 0; i < sizeof(data); i++)
-			fout.write(reinterpret_cast<char*>(&key[p[i]]), sizeof(char));
-		fout.close();
-		return *this;
-	}
-
-	template<>
-	Encryptor& operator<<(const char* data) {
-		std::ofstream fout(filename, std::ios::out | std::ios::app | std::ios::binary);
-		check_file(fout);
-		uint16_t len = (uint16_t)strlen(data);
-		//if (len > 256) throw std::exception("long string");
-		fout.write((char*)&len, sizeof(len));
-		for (uint16_t i = 0; i < len; i++)
-			fout.write((char*)&key[(unsigned char)data[i]], sizeof(char));
-		fout.close();
-		return *this;
-	}
-
-	//template<>// Не работает как специализация шаблона
-	Encryptor& operator<<(const std::string& data) {
-		std::ofstream fout(filename, std::ios::out | std::ios::app | std::ios::binary);
-		//if (!check_file(fout)) throw std::exception("file error");
-		check_file(fout);
-		uint16_t len = (uint16_t)data.length();
-		fout.write((char*)&len, sizeof(len));
-		for (uint16_t i = 0; i < len; i++)
-			fout.write((char*)&key[(unsigned char)data[i]], sizeof(char));
-		fout.close();
-		return *this;
-	}
-
-	Decryptor make_decryptor() const {
-		return Decryptor(filename.c_str(), key);
-	}
-};
 

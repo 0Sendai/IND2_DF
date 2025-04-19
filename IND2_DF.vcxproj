@@ -127,10 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="crypto.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="crypto.hpp" />
+    <ClInclude Include="Decryptor.hpp" />
+    <ClInclude Include="CryptoKey.hpp" />
+    <ClInclude Include="Encryptor.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
