@@ -2,7 +2,6 @@
 #include <cstring>
 #include "CryptoKey.hpp"
 
-// TODO документирующие комментарии
 // TODO вывод на экран :( (хранить в файле и тип данных ?)
 // TODO тесты
 class Encryptor;
@@ -10,7 +9,6 @@ class Encryptor;
 class Decryptor : public CryptoKey {
 protected:
 	std::string filename;
-
 	std::ifstream fin;
 
 	void check_file(std::ifstream& file) {
@@ -24,6 +22,7 @@ protected:
 	}
 public:
 	Decryptor() {};
+
 	Decryptor(const char* encrypted_file, const unsigned char* key) : filename(encrypted_file) {
 		for (int i = 0; i < 256; i++)
 			this->key[key[i]] = i;
@@ -38,12 +37,12 @@ public:
 		for (int i = 0; i < 256; i++)
 			key[inv_key[i]] = i;
 	}
-
+	
 	Decryptor(const Decryptor& other) {
 		memcpy_s(key, sizeof(key), other.key, sizeof(key));
 		filename = other.filename;
 	}
-
+	
 	Decryptor(Decryptor&& other) noexcept {
 		filename = std::move(other.filename);
 		fin = std::move(other.fin);
@@ -99,7 +98,6 @@ public:
 		return *this;
 	}
 
-	// out обязательно nullptr
 	template<>
 	Decryptor& operator>>(char*& out) {
 		if (!fin.is_open())
