@@ -2,8 +2,7 @@
 #include <cstring>
 #include "CryptoKey.hpp"
 
-// TODO вывод на экран :( (хранить в файле и тип данных ?)
-// TODO тесты
+
 class Encryptor;
 
 class Decryptor : public CryptoKey {

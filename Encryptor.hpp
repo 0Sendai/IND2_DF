@@ -3,6 +3,9 @@
 
 class Decryptor;
 
+/// <summary>
+/// Ўифрование строк только в кодировке ascii или windows-1251
+/// </summary>
 class Encryptor : public CryptoKey {
 protected:
 	std::string filename;
