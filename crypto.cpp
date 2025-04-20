@@ -5,6 +5,7 @@
 	 return Decryptor(filename.c_str(), key);
 }
 
+// encryptor дописывает в файл без перезаписи
  Encryptor Decryptor::make_encryptor() const {
 	 return Encryptor(filename.c_str(), key);
  }
