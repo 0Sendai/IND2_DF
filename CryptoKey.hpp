@@ -1,9 +1,9 @@
 #pragma once
-#include <iostream>
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
 #include <exception>
+#include <iostream>
 
 class FileException : public std::exception {
 private:
@@ -29,14 +29,21 @@ public:
 	}
 	void write_key(const char* filename) const {
 		std::ofstream fout(filename, std::ios::out | std::ios::binary);
-		if (!fout.is_open()) throw fexception;
+		if (!fout.is_open()) {
+			std::cout << "Keyfile error. Can't write key\n";
+			return;
+		}
+
 		fout.write((char*)key, sizeof(key));
 		fout.close();
 	}
 
 	void read_key(const char* filename) {
 		std::ifstream fin(filename, std::ios::in | std::ios::binary);
-		if (!fin.is_open()) throw fexception;
+		if (!fin.is_open()) {
+			std::cout << "Keyfile error. Generating another key...\n";
+			make_key();
+		}
 		fin.read((char*)key, sizeof(key));
 		fin.close();
 	}

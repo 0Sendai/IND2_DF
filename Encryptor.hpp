@@ -1,6 +1,5 @@
 #pragma once
 #include "CryptoKey.hpp"
-
 class Decryptor;
 
 /// <summary>
@@ -78,7 +77,7 @@ public:
 		check_file(fout);
 		unsigned char* p = reinterpret_cast<unsigned char*>(&data);
 		for (int i = 0; i < sizeof(data); i++)
-			fout.write(reinterpret_cast<char*>(&key[p[i]]), sizeof(char));
+			fout.write((char*)&key[p[i]], sizeof(char));
 		fout.close();
 		return *this;
 	}
@@ -101,8 +100,9 @@ public:
 		check_file(fout);
 		uint16_t len = (uint16_t)data.length();
 		fout.write((char*)&len, sizeof(len));
-		for (uint16_t i = 0; i < len; i++)
+		for (uint16_t i = 0; i < len; i++) 
 			fout.write((char*)&key[(unsigned char)data[i]], sizeof(char));
+
 		fout.close();
 		return *this;
 	}

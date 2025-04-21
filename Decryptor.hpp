@@ -2,7 +2,6 @@
 #include <cstring>
 #include "CryptoKey.hpp"
 
-
 class Encryptor;
 
 class Decryptor : public CryptoKey {
@@ -27,14 +26,21 @@ public:
 			this->key[key[i]] = i;
 	}
 
+
 	Decryptor(const char* encrypted_file, const char* key_filename) : filename(encrypted_file) {
 		std::ifstream keyfile(key_filename, std::ios::in | std::ios::binary);
-
-		unsigned char inv_key[256];
-		keyfile.read((char*)inv_key, sizeof(inv_key));
-		keyfile.close();
-		for (int i = 0; i < 256; i++)
-			key[inv_key[i]] = i;
+		if (!keyfile.is_open()) {
+			// Как не завершать программу или не создавать бредовый ключ ?
+			std::cout << "Keyfile error. Generating another key...\n";
+			make_key();
+		}
+		else {
+			unsigned char inv_key[256];
+			keyfile.read((char*)inv_key, sizeof(inv_key));
+			keyfile.close();
+			for (int i = 0; i < 256; i++)
+				key[inv_key[i]] = i;
+		}
 	}
 	
 	Decryptor(const Decryptor& other) {
@@ -84,34 +90,36 @@ public:
 
 	template<typename T>
 	Decryptor& operator>>(T& out) {
-		if (!fin.is_open())
+		if (!fin.is_open()) {
+			fin.clear();
 			fin.open(filename, std::ios::in | std::ios::binary);
+		}
 		check_file(fin);
-		unsigned char tmp[sizeof(out)];
-		fin.read((char*)tmp, sizeof(out));
+		
 		unsigned char* p = reinterpret_cast<unsigned char*>(&out);
-		for (int i = 0; i < sizeof(out); i++)
-			tmp[i] = key[tmp[i]];
+		fin.read((char*)p, sizeof(out));
+		for (uint16_t i = 0; i < sizeof(out); i++)
+			p[i] = key[p[i]];
 			
-		memcpy_s(&out, sizeof(out), tmp, sizeof(out));
 		return *this;
 	}
 
 	template<>
 	Decryptor& operator>>(char*& out) {
-		if (!fin.is_open())
+		if (!fin.is_open()) {
+			fin.clear();
 			fin.open(filename, std::ios::in | std::ios::binary);
+		}
 		check_file(fin);
 		uint16_t len;
 		fin.read((char*)&len, sizeof(len));
-		unsigned char* tmp = new unsigned char[len];
+		if (len < 0) throw fexception;
 		if (!out) delete[] out;
 		out = new char [len + 1];
-		fin.read((char*)tmp, len);
+		fin.read(out, len);
 		for (uint16_t i = 0; i < len; i++)
-			out[i] = key[tmp[i]];
+			out[i] = key[(unsigned char)out[i]];
 
-		delete[] tmp;
 		out[len] = 0;
 		return *this;
 	}
@@ -119,17 +127,18 @@ public:
 
 	template<>
 	Decryptor& operator>>(std::string& out) {
-		if (!fin.is_open())
+		if (!fin.is_open()) {
+			fin.clear();
 			fin.open(filename, std::ios::in | std::ios::binary);
+		}
 		check_file(fin);
 		uint16_t len;
 		fin.read((char*)&len, sizeof(len));
+		if (len < 0) throw fexception;
 		out.resize(len);
-		unsigned char* tmp = new unsigned char[len];
-		fin.read((char*)tmp, len);
+		fin.read((char*)&out[0], len);
 		for (uint16_t i = 0; i < len; i++)
-			out[i] = key[tmp[i]];
-		delete[] tmp;
+			out[i] = key[(unsigned char)out[i]];
 		return *this;
 	}
 
