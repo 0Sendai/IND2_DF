@@ -3,7 +3,7 @@
 class Decryptor;
 
 /// <summary>
-/// Шифрование строк только в кодировке ascii или windows-1251
+/// РЁРёС„СЂРѕРІР°РЅРёРµ СЃС‚СЂРѕРє С‚РѕР»СЊРєРѕ РІ РєРѕРґРёСЂРѕРІРєРµ ascii РёР»Рё windows-1251
 /// </summary>
 class Encryptor : public CryptoKey {
 protected:
@@ -94,7 +94,7 @@ public:
 		return *this;
 	}
 
-	//template<>// Не работает как специализация шаблона
+	//template<>// РќРµ СЂР°Р±РѕС‚Р°РµС‚ РєР°Рє СЃРїРµС†РёР°Р»РёР·Р°С†РёСЏ С€Р°Р±Р»РѕРЅР°
 	Encryptor& operator<<(const std::string& data) {
 		std::ofstream fout(filename, std::ios::out | std::ios::app | std::ios::binary);
 		check_file(fout);
